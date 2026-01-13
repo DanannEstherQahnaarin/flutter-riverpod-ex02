@@ -4,27 +4,6 @@ import '../widget/custom_button.dart';
 /// 확인/취소 다이얼로그 위젯
 ///
 /// 사용자에게 확인을 요청하는 다이얼로그입니다.
-/// 재사용 가능한 구조로 설계되었습니다.
-///
-/// 주요 특징:
-/// - 확인/취소 버튼 제공
-/// - 커스터마이징 가능한 제목과 메시지
-/// - 재사용 가능한 구조
-///
-/// 예시:
-/// ```dart
-/// showDialog(
-///   context: context,
-///   builder: (context) => ConfirmDialog(
-///     title: '삭제 확인',
-///     message: '정말 삭제하시겠습니까?',
-///     onConfirm: () {
-///       // 확인 처리
-///       Navigator.of(context).pop();
-///     },
-///   ),
-/// );
-/// ```
 class ConfirmDialog extends StatelessWidget {
   /// 다이얼로그 제목
   ///

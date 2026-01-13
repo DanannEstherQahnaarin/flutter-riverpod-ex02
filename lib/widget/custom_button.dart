@@ -29,25 +29,6 @@ enum ButtonSize {
 }
 
 /// 재사용 가능한 커스텀 버튼 위젯
-///
-/// 다양한 스타일과 크기의 버튼을 제공합니다.
-/// Material Design 가이드라인을 따르며, 일관된 UI를 제공합니다.
-///
-/// 주요 특징:
-/// - 다양한 스타일 지원 (primary, secondary, danger)
-/// - 다양한 크기 지원 (small, medium, large)
-/// - Props 기반 설계로 재사용성 높음
-/// - 비활성화 상태 지원
-///
-/// 예시:
-/// ```dart
-/// CustomButton(
-///   text: '저장',
-///   onPressed: () => handleSave(),
-///   style: CustomButtonStyle.primary,
-///   size: ButtonSize.medium,
-/// )
-/// ```
 class CustomButton extends StatelessWidget {
   /// 버튼에 표시될 텍스트
   ///
