@@ -4,6 +4,8 @@ import 'package:flutter_card_ui_app_ex01/provider/card_provider.dart';
 import 'package:flutter_card_ui_app_ex01/model/card_item.dart';
 import 'package:flutter_card_ui_app_ex01/screens/card_add.dart';
 import 'package:flutter_card_ui_app_ex01/screens/card_detail.dart';
+import 'package:flutter_card_ui_app_ex01/widget/custom_button.dart';
+import 'package:flutter_card_ui_app_ex01/dialogs/confirm_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardListScreen extends ConsumerStatefulWidget {
@@ -171,7 +173,7 @@ class _CardListScreenState extends ConsumerState<CardListScreen> {
   }
 }
 
-class GridCardItem extends StatelessWidget {
+class GridCardItem extends ConsumerWidget {
   const GridCardItem({super.key, required this.card});
 
   final CardItem card;
@@ -182,10 +184,31 @@ class GridCardItem extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (context) => CardDetailScreen(cardItem: card)));
   }
 
-  Future<void> _delete() async {}
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    await showDialog<bool>(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: '카드 삭제',
+        message: '${card.title} 카드를 삭제하시겠습니까?',
+        confirmText: '삭제',
+        onConfirm: () async {
+          final deleteResult = await ref.read(cardProvider.notifier).deleteCard(card.id);
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(deleteResult.message),
+                backgroundColor: deleteResult.success ? Colors.green : Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context, WidgetRef ref) => Card(
     child: Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -198,19 +221,23 @@ class GridCardItem extends StatelessWidget {
               InkWell(
                 onTap: () => _detailCard(context),
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: card.isUse ? Colors.green.shade100 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    card.isUse ? '사용중' : '미사용',
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
                     style: TextStyle(
                       fontSize: 10,
                       color: card.isUse ? Colors.green.shade700 : Colors.grey.shade700,
                       fontWeight: FontWeight.w500,
                     ),
+                    child: Text(card.isUse ? '사용중' : '미사용'),
                   ),
                 ),
               ),
@@ -240,11 +267,11 @@ class GridCardItem extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                onPressed: _delete,
-                icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
+              CustomButton(
+                text: 'Delete',
+                size: ButtonSize.small,
+                style: CustomButtonStyle.danger,
+                onPressed: () => _delete(context, ref),
               ),
               const SizedBox(width: 4),
             ],

@@ -118,7 +118,7 @@ class _CardFormState extends State<CardForm> {
                       initialValue: widget.initalCi?.category,
                       onChanged: (key, value) {
                         setState(() {
-                          _selectedCategory = key;
+                          _selectedCategory = value;
                         });
                       },
                     ),
