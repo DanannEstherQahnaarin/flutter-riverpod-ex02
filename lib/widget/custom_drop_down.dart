@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// 선택 시 콜백 함수를 통해 선택된 값을 전달합니다.
 ///
 /// 주요 특징:
-/// - Map<String, String> 형태의 아이템 지원
+/// - `Map<String, String>` 형태의 아이템 지원
 /// - 라벨 및 힌트 텍스트 지원
 /// - 에러 메시지 표시
 /// - 선택 콜백 함수 지원
@@ -40,7 +40,7 @@ class CustomDropDown extends StatelessWidget {
 
   /// 드롭다운 아이템
   ///
-  /// Map<String, String> 형태로 key-value 쌍을 받습니다.
+  /// `Map<String, String>` 형태로 key-value 쌍을 받습니다.
   /// key는 선택 시 콜백에 전달되는 값이고,
   /// value는 드롭다운에 표시되는 텍스트입니다.
   final Map<String, String> items;

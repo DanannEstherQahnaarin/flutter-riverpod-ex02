@@ -95,9 +95,7 @@ class CardNotifier extends Notifier<List<CardItem>> {
       }
 
       // 카드 삭제
-      final updatedList = List<CardItem>.from(state);
-      updatedList.removeAt(index);
-      state = updatedList;
+      state = (List<CardItem>.from(state)..removeAt(index));
       logger.i('카드 삭제 성공: $id');
       return (success: true, message: '카드가 성공적으로 삭제되었습니다.');
     } on CardItemIdEmptyException catch (e, stackTrace) {

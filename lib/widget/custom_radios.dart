@@ -15,7 +15,7 @@ enum RadioDirection {
 /// 선택 시 콜백 함수를 통해 선택된 값을 전달합니다.
 ///
 /// 주요 특징:
-/// - Map<String, String> 형태의 아이템 지원
+/// - `Map<String, String>` 형태의 아이템 지원
 /// - 최소 2개 이상의 라디오 버튼 필요
 /// - 가로/세로 배치 선택 가능
 /// - 라벨 및 에러 메시지 지원
@@ -44,7 +44,7 @@ class CustomRadios extends StatefulWidget {
 
   /// 라디오 버튼 아이템
   ///
-  /// Map<String, String> 형태로 key-value 쌍을 받습니다.
+  /// `Map<String, String>` 형태로 key-value 쌍을 받습니다.
   /// key는 선택 시 콜백에 전달되는 값이고,
   /// value는 라디오 버튼에 표시되는 텍스트입니다.
   /// 최소 2개 이상의 아이템이 필요합니다.
@@ -149,7 +149,9 @@ class _CustomRadiosState extends State<CustomRadios> {
           (entry) => RadioListTile<String>(
             title: Text(entry.value),
             value: entry.key,
+            // ignore: deprecated_member_use
             groupValue: _selectedValue,
+            // ignore: deprecated_member_use
             onChanged: widget.enabled ? _handleChanged : null,
             contentPadding: EdgeInsets.zero,
             dense: true,

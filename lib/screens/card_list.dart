@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_card_ui_app_ex01/provider/card_provider.dart';
 import 'package:flutter_card_ui_app_ex01/model/card_item.dart';
 import 'package:flutter_card_ui_app_ex01/screens/card_add.dart';
+import 'package:flutter_card_ui_app_ex01/screens/card_detail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardListScreen extends ConsumerStatefulWidget {
@@ -85,12 +86,7 @@ class _CardListScreenState extends ConsumerState<CardListScreen> {
   }
 
   Future<void> _addCard() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CardAddScreen();
-      },
-    );
+    showDialog(context: context, builder: (context) => const CardAddScreen());
   }
 
   /// 반응형 crossAxisCount 계산
@@ -108,9 +104,9 @@ class _CardListScreenState extends ConsumerState<CardListScreen> {
 
     // 데스크탑/웹: 화면 넓이에 따라 계산
     final screenWidth = MediaQuery.of(context).size.width;
-    final padding = 16.0 * 2; // 좌우 패딩
-    final spacing = 16.0; // 카드 간 간격
-    final cardMinWidth = 200.0; // 카드 최소 너비
+    const padding = 16.0 * 2; // 좌우 패딩
+    const spacing = 16.0; // 카드 간 간격
+    const cardMinWidth = 200.0; // 카드 최소 너비
 
     // 사용 가능한 너비 계산
     final availableWidth = screenWidth - padding;
@@ -180,7 +176,11 @@ class GridCardItem extends StatelessWidget {
 
   final CardItem card;
 
-  Future<void> _detailCard() async {}
+  Future<void> _detailCard(BuildContext context) async {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => CardDetailScreen(cardItem: card)));
+  }
 
   Future<void> _delete() async {}
 
@@ -195,18 +195,22 @@ class GridCardItem extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: card.isUse ? Colors.green.shade100 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  card.isUse ? '사용중' : '미사용',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: card.isUse ? Colors.green.shade700 : Colors.grey.shade700,
-                    fontWeight: FontWeight.w500,
+              InkWell(
+                onTap: () => _detailCard(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: card.isUse ? Colors.green.shade100 : Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    card.isUse ? '사용중' : '미사용',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: card.isUse ? Colors.green.shade700 : Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

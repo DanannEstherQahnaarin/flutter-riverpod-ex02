@@ -5,7 +5,6 @@ import 'package:flutter_card_ui_app_ex01/widget/custom_button.dart';
 import 'package:flutter_card_ui_app_ex01/widget/custom_drop_down.dart';
 import 'package:flutter_card_ui_app_ex01/widget/custom_radios.dart';
 import 'package:flutter_card_ui_app_ex01/widget/custom_text_field.dart';
-import 'package:flutter/foundation.dart';
 
 class CardForm extends StatefulWidget {
   final CardItem? initalCi;
@@ -45,7 +44,7 @@ class _CardFormState extends State<CardForm> {
   void initState() {
     super.initState();
     _txtTitleController = TextEditingController(text: widget.initalCi?.title ?? '');
-    _editorState = EditorState.blank(withInitialText: true);
+    _editorState = EditorState.blank();
     _selectedCategory = widget.initalCi?.category;
     _isUse = widget.initalCi?.isUse ?? true;
   }
@@ -80,7 +79,7 @@ class _CardFormState extends State<CardForm> {
       text: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
     );
 
-    Map<String, String> _category() => {
+    Map<String, String> category() => {
       'cate1': '업무',
       'cate2': '개인',
       'cate3': '교육',
@@ -89,7 +88,7 @@ class _CardFormState extends State<CardForm> {
       'cate6': '취미',
     };
 
-    Map<String, String> _using() => {'is_use': '사용', 'is_not_use': '미사용'};
+    Map<String, String> using() => {'is_use': '사용', 'is_not_use': '미사용'};
 
     return SingleChildScrollView(
       child: Padding(
@@ -112,7 +111,7 @@ class _CardFormState extends State<CardForm> {
                   SizedBox(
                     width: 300,
                     child: CustomDropDown(
-                      items: _category(),
+                      items: category(),
                       label: 'Category',
                       hint: 'select category...',
                       enabled: !widget.isReadOnly,
@@ -128,7 +127,7 @@ class _CardFormState extends State<CardForm> {
                   SizedBox(
                     width: 200,
                     child: CustomRadios(
-                      items: _using(),
+                      items: using(),
                       label: 'Use',
                       direction: RadioDirection.horizontal,
                       enabled: !widget.isReadOnly,
@@ -179,7 +178,6 @@ class _CardFormState extends State<CardForm> {
                     const SizedBox(width: 20),
                     CustomButton(
                       text: 'Add',
-                      style: CustomButtonStyle.primary,
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
                           final title = _txtTitleController.text.trim();
