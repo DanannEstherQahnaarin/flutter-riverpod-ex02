@@ -1,202 +1,140 @@
 import 'package:flutter/material.dart';
 
-/// 라디오 버튼 배치 방향
-enum RadioDirection {
-  /// 가로 배치
-  horizontal,
+enum RadioDirection { horizontal, vertical }
 
-  /// 세로 배치
-  vertical,
-}
-
-/// 재사용 가능한 커스텀 라디오 버튼 그룹 위젯
+/// 제네릭(Generic)을 적용한 커스텀 라디오 그룹 위젯
 ///
-/// Map 구조의 아이템을 받아 라디오 버튼 그룹을 생성합니다.
-/// 선택 시 콜백 함수를 통해 선택된 값을 전달합니다.
-///
-/// 주요 특징:
-/// - `Map<String, String>` 형태의 아이템 지원
-/// - 최소 2개 이상의 라디오 버튼 필요
-/// - 가로/세로 배치 선택 가능
-/// - 라벨 및 에러 메시지 지원
-/// - 선택 콜백 함수 지원
-/// - 초기값 설정 가능
-///
-/// 예시:
-/// ```dart
-/// CustomRadios(
-///   label: '사용 여부',
-///   items: {
-///     'true': '사용중',
-///     'false': '미사용',
-///   },
-///   direction: RadioDirection.horizontal,
-///   onChanged: (key, value) {
-///     print('선택된 값: $key - $value');
-///   },
-/// )
-/// ```
-class CustomRadios extends StatefulWidget {
-  /// 필드 라벨
-  ///
-  /// 필드 위에 표시될 라벨 텍스트입니다.
-  final String? label;
-
+/// [T]는 라디오 버튼의 값(Value) 타입입니다. (예: String, int, Enum 등)
+class CustomRadios<T> extends StatelessWidget {
   /// 라디오 버튼 아이템
-  ///
-  /// `Map<String, String>` 형태로 key-value 쌍을 받습니다.
-  /// key는 선택 시 콜백에 전달되는 값이고,
-  /// value는 라디오 버튼에 표시되는 텍스트입니다.
-  /// 최소 2개 이상의 아이템이 필요합니다.
-  final Map<String, String> items;
+  /// key: 실제 값 (T), value: 화면에 표시될 라벨 (String)
+  final Map<T, String> items;
 
-  /// 선택 변경 콜백
-  ///
-  /// 라디오 버튼이 선택될 때 호출되는 콜백입니다.
-  /// 첫 번째 파라미터는 선택된 아이템의 key,
-  /// 두 번째 파라미터는 선택된 아이템의 value입니다.
-  final void Function(String key, String value)? onChanged;
+  /// 현재 선택된 값 (Controlled Component)
+  /// 부모 위젯에서 상태를 관리해야 합니다.
+  final T? groupValue;
 
-  /// 초기 선택 값
+  /// 초기 선택 값 (initialValue와 groupValue 중 하나만 사용)
   ///
   /// 라디오 버튼 그룹의 초기 선택 값을 설정합니다.
   /// items의 key 중 하나여야 합니다.
-  final String? initialValue;
+  final T? initialValue;
 
-  /// 에러 메시지
+  /// 값 변경 콜백 (새로운 형식: `ValueChanged<T?>`?)
+  final ValueChanged<T?>? onChanged;
+
+  /// 값 변경 콜백 (기존 형식: void Function(T?, String?)?)
   ///
-  /// 유효성 검증 실패 시 표시될 에러 메시지입니다.
-  /// null이 아닐 경우 에러 스타일로 표시됩니다.
+  /// 첫 번째 파라미터는 선택된 아이템의 key,
+  /// 두 번째 파라미터는 선택된 아이템의 value입니다.
+  final void Function(T?, String?)? onChangedLegacy;
+
+  final String? label;
   final String? errorText;
-
-  /// 배치 방향
-  ///
-  /// 라디오 버튼을 가로로 배치할지 세로로 배치할지 결정합니다.
-  /// 기본값은 세로(vertical)입니다.
   final RadioDirection direction;
-
-  /// 비활성화 여부
-  ///
-  /// true일 경우 라디오 버튼이 비활성화됩니다.
   final bool enabled;
 
-  /// 라디오 버튼 간 간격
-  ///
-  /// 라디오 버튼 사이의 간격을 설정합니다.
-  /// 기본값은 16.0입니다.
+  // [개선] Wrap 위젯을 위한 정렬 및 간격 옵션 추가
   final double spacing;
+  final double runSpacing;
 
-  /// CustomRadios 생성자
-  ///
-  /// [label] 필드 라벨 (선택사항)
-  /// [items] 라디오 버튼 아이템 (필수, 최소 2개 이상)
-  /// [onChanged] 선택 변경 콜백 (선택사항)
-  /// [initialValue] 초기 선택 값 (선택사항)
-  /// [errorText] 에러 메시지 (선택사항)
-  /// [direction] 배치 방향 (기본값: RadioDirection.vertical)
-  /// [enabled] 비활성화 여부 (기본값: true)
-  /// [spacing] 라디오 버튼 간 간격 (기본값: 16.0)
   const CustomRadios({
     super.key,
-    this.label,
     required this.items,
-    this.onChanged,
+    this.groupValue,
     this.initialValue,
+    this.onChanged,
+    this.onChangedLegacy,
+    this.label,
     this.errorText,
     this.direction = RadioDirection.vertical,
     this.enabled = true,
     this.spacing = 16.0,
+    this.runSpacing = 8.0,
   }) : assert(items.length >= 2, '라디오 버튼은 최소 2개 이상이어야 합니다.');
 
   @override
-  State<CustomRadios> createState() => _CustomRadiosState();
-}
-
-class _CustomRadiosState extends State<CustomRadios> {
-  late String? _selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedValue = widget.initialValue;
-  }
-
-  @override
-  void didUpdateWidget(CustomRadios oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != oldWidget.initialValue) {
-      _selectedValue = widget.initialValue;
-    }
-  }
-
-  void _handleChanged(String? value) {
-    if (value != null && widget.enabled) {
-      setState(() {
-        _selectedValue = value;
-      });
-
-      if (widget.onChanged != null) {
-        final selectedText = widget.items[value] ?? '';
-        widget.onChanged!(value, selectedText);
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final radioWidgets = widget.items.entries
-        .map(
-          (entry) => RadioListTile<String>(
-            title: Text(entry.value),
-            value: entry.key,
-            // ignore: deprecated_member_use
-            groupValue: _selectedValue,
-            // ignore: deprecated_member_use
-            onChanged: widget.enabled ? _handleChanged : null,
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            visualDensity: VisualDensity.compact,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // 현재 선택된 값 결정 (groupValue 또는 initialValue)
+    final currentValue = groupValue ?? initialValue;
+
+    // 라디오 버튼 리스트 생성
+    final radioList = items.entries.map((entry) {
+      final isSelected = entry.key == currentValue;
+
+      return IntrinsicWidth(
+        child: RadioListTile<T>(
+          title: Text(
+            entry.value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: enabled
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurface.withValues(alpha: 0.38),
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
-        )
-        .toList();
+          value: entry.key,
+          // ignore: deprecated_member_use
+          groupValue: currentValue,
+          // ignore: deprecated_member_use
+          onChanged: enabled
+              ? (T? selectedValue) {
+                  if (selectedValue != null) {
+                    final selectedText = items[selectedValue];
+                    // 새로운 형식의 콜백 호출
+                    onChanged?.call(selectedValue);
+                    // 기존 형식의 콜백 호출 (하위 호환성)
+                    onChangedLegacy?.call(selectedValue, selectedText);
+                  }
+                }
+              : null,
+          contentPadding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
+          dense: true,
+          // 선택된 항목 강조 색상
+          activeColor: errorText != null ? colorScheme.error : colorScheme.primary,
+        ),
+      );
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.label != null) ...[
+        // 라벨 영역
+        if (label != null) ...[
           Text(
-            widget.label!,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: widget.errorText != null ? Colors.red : Colors.grey.shade700,
+            label!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: errorText != null ? colorScheme.error : colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
         ],
-        widget.direction == RadioDirection.horizontal
-            ? Row(
-                children: [
-                  for (int i = 0; i < radioWidgets.length; i++) ...[
-                    Expanded(child: radioWidgets[i]),
-                    if (i < radioWidgets.length - 1) SizedBox(width: widget.spacing),
-                  ],
-                ],
+
+        // 배치 영역 (Wrap 사용으로 오버플로우 방지)
+        direction == RadioDirection.horizontal
+            ? Wrap(
+                spacing: spacing, // 가로 간격
+                runSpacing: runSpacing, // 세로 줄바꿈 간격
+                children: radioList
+                    .map(
+                      (widget) => Row(mainAxisSize: MainAxisSize.min, children: [widget]),
+                    )
+                    .toList(),
               )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int i = 0; i < radioWidgets.length; i++) ...[
-                    radioWidgets[i],
-                    if (i < radioWidgets.length - 1) SizedBox(height: widget.spacing),
-                  ],
-                ],
-              ),
-        if (widget.errorText != null) ...[
-          const SizedBox(height: 4),
+            : Column(crossAxisAlignment: CrossAxisAlignment.start, children: radioList),
+
+        // 에러 메시지 영역
+        if (errorText != null) ...[
+          const SizedBox(height: 6),
           Text(
-            widget.errorText!,
-            style: const TextStyle(fontSize: 12, color: Colors.red),
+            errorText!,
+            style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.error),
           ),
         ],
       ],

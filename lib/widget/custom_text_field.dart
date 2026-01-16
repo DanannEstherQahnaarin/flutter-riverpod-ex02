@@ -1,86 +1,27 @@
 import 'package:flutter/material.dart';
 
-/// 재사용 가능한 커스텀 텍스트 필드 위젯
-///
-/// 라벨, 힌트, 에러 메시지를 지원하는 텍스트 입력 필드입니다.
-/// 유효성 검증 상태를 시각적으로 표시합니다.
-///
-/// 주요 특징:
-/// - 라벨 및 힌트 텍스트 지원
-/// - 에러 메시지 표시
-/// - 유효성 검증 상태 시각화
-/// - Props 기반 설계로 재사용성 높음
-///
-/// 예시:
-/// ```dart
-/// CustomTextField(
-///   label: '제목',
-///   hint: '할일 제목을 입력하세요',
-///   controller: titleController,
-///   errorText: validationError,
-///   onChanged: (value) => validateTitle(value),
-/// )
-/// ```
 class CustomTextField extends StatelessWidget {
-  /// 필드 라벨
-  ///
-  /// 필드 위에 표시될 라벨 텍스트입니다.
   final String? label;
-
-  /// 힌트 텍스트
-  ///
-  /// 필드가 비어있을 때 표시될 힌트입니다.
   final String? hint;
-
-  /// 텍스트 컨트롤러
-  ///
-  /// 텍스트 필드의 값을 제어하는 컨트롤러입니다.
   final TextEditingController? controller;
-
-  /// 에러 메시지
-  ///
-  /// 유효성 검증 실패 시 표시될 에러 메시지입니다.
-  /// null이 아닐 경우 에러 스타일로 표시됩니다.
   final String? errorText;
-
-  /// 텍스트 변경 콜백
-  ///
-  /// 텍스트가 변경될 때마다 호출되는 콜백입니다.
   final ValueChanged<String>? onChanged;
-
-  /// 최대 라인 수
-  ///
-  /// 여러 줄 입력을 지원하는 경우 최대 라인 수입니다.
-  /// 기본값은 1입니다.
   final int maxLines;
-
-  /// 최대 문자 수
-  ///
-  /// 입력 가능한 최대 문자 수입니다.
   final int? maxLength;
-
-  /// 읽기 전용 여부
-  ///
-  /// true일 경우 입력이 불가능합니다.
   final bool readOnly;
-
-  /// 탭 이벤트 콜백
-  ///
-  /// 필드를 탭했을 때 호출되는 콜백입니다.
-  /// 주로 날짜 선택 등에 사용됩니다.
   final VoidCallback? onTap;
 
-  /// CustomTextField 생성자
-  ///
-  /// [label] 필드 라벨 (선택사항)
-  /// [hint] 힌트 텍스트 (선택사항)
-  /// [controller] 텍스트 컨트롤러 (선택사항)
-  /// [errorText] 에러 메시지 (선택사항)
-  /// [onChanged] 텍스트 변경 콜백 (선택사항)
-  /// [maxLines] 최대 라인 수 (기본값: 1)
-  /// [maxLength] 최대 문자 수 (선택사항)
-  /// [readOnly] 읽기 전용 여부 (기본값: false)
-  /// [onTap] 탭 이벤트 콜백 (선택사항)
+  // [추가] 키보드 타입 (이메일, 숫자 등)
+  final TextInputType? keyboardType;
+  // [추가] 키보드 액션 (완료, 다음 등)
+  final TextInputAction? textInputAction;
+  // [추가] 비밀번호 숨김 여부
+  final bool obscureText;
+  // [추가] 우측 아이콘 커스텀 (달력 고정 X)
+  final Widget? suffixIcon;
+  // [추가] 포커스 노드 (포커스 제어용)
+  final FocusNode? focusNode;
+
   const CustomTextField({
     super.key,
     this.label,
@@ -92,63 +33,104 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.readOnly = false,
     this.onTap,
+    this.keyboardType,
+    this.textInputAction,
+    this.obscureText = false,
+    this.suffixIcon,
+    this.focusNode,
   });
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      if (label != null) ...[
-        Text(
-          label!,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: errorText != null ? Colors.red : Colors.grey.shade700,
+  Widget build(BuildContext context) {
+    // 앱 테마 색상 참조
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // onTap이 있으면 강제로 읽기 전용으로 설정 (키보드 방지)
+    final isReadOnly = readOnly || onTap != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (label != null) ...[
+          Text(
+            label!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: errorText != null ? colorScheme.error : colorScheme.onSurface,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-      ],
-      GestureDetector(
-        onTap: onTap,
-        child: TextField(
+          const SizedBox(height: 8),
+        ],
+        // [개선] GestureDetector 제거 -> TextField 자체 onTap 활용
+        TextField(
           controller: controller,
+          focusNode: focusNode,
           onChanged: onChanged,
           maxLines: maxLines,
           maxLength: maxLength,
-          readOnly: readOnly,
-          enabled: onTap == null, // onTap이 있으면 enabled를 false로 설정하여 키보드 표시 방지
+          // [개선] onTap이 있으면 readOnly를 true로 하여 키보드 등장을 막음
+          readOnly: isReadOnly,
+          onTap: onTap,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          obscureText: obscureText,
+          style: theme.textTheme.bodyLarge,
+          // enabled: false를 제거하여 시각적으로 '죽은' 위젯처럼 보이지 않게 함
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.4)),
             errorText: errorText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+
+            // [개선] 배경색: 읽기 전용일 때만 약간 어둡게 처리
+            filled: true,
+            fillColor: isReadOnly
+                ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                : colorScheme.surface,
+
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+
+            // [개선] suffixIcon 로직 변경
+            // 외부에서 주입된 아이콘이 우선, onTap이 있는데 아이콘이 없으면 기본 아이콘 표시 가능
+            suffixIcon:
+                suffixIcon ??
+                (onTap != null
+                    ? Icon(
+                        Icons.calendar_today,
+                        size: 20,
+                        color: colorScheme.onSurfaceVariant,
+                      )
+                    : null),
+
+            // 테두리 스타일 (테마 기반)
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: colorScheme.outline),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : Colors.grey.shade300,
+                color: errorText != null ? colorScheme.error : colorScheme.outline,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : Colors.blue,
+                color: errorText != null ? colorScheme.error : colorScheme.primary,
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: BorderSide(color: colorScheme.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
+              borderSide: BorderSide(color: colorScheme.error, width: 2),
             ),
-            filled: true,
-            fillColor: readOnly || onTap != null ? Colors.grey.shade100 : Colors.white,
-            suffixIcon: onTap != null ? const Icon(Icons.calendar_today, size: 20) : null,
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

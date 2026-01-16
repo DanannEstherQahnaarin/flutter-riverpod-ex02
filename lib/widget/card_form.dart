@@ -110,15 +110,15 @@ class _CardFormState extends State<CardForm> {
                 children: [
                   SizedBox(
                     width: 300,
-                    child: CustomDropDown(
+                    child: CustomDropDown<String, String>(
                       items: category(),
                       label: 'Category',
                       hint: 'select category...',
                       enabled: !widget.isReadOnly,
                       initialValue: widget.initalCi?.category,
-                      onChanged: (key, value) {
+                      onChangedLegacy: (key, value) {
                         setState(() {
-                          _selectedCategory = value;
+                          _selectedCategory = key;
                         });
                       },
                     ),
@@ -126,7 +126,7 @@ class _CardFormState extends State<CardForm> {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 200,
-                    child: CustomRadios(
+                    child: CustomRadios<String>(
                       items: using(),
                       label: 'Use',
                       direction: RadioDirection.horizontal,
@@ -134,7 +134,7 @@ class _CardFormState extends State<CardForm> {
                       initialValue: widget.initalCi?.isUse == true
                           ? 'is_use'
                           : 'is_not_use',
-                      onChanged: (key, value) {
+                      onChangedLegacy: (key, value) {
                         setState(() {
                           _isUse = key == 'is_use';
                         });

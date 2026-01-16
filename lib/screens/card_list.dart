@@ -209,74 +209,67 @@ class GridCardItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // isUse 상태 표시
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              InkWell(
-                onTap: () => _detailCard(context),
-                borderRadius: BorderRadius.circular(12),
-                child: AnimatedContainer(
+    child: InkWell(
+      splashColor: const Color.fromARGB(26, 122, 118, 184),
+      highlightColor: const Color.fromARGB(251, 97, 118, 214),
+      borderRadius: BorderRadius.circular(20), // 물결 효과도 둥글게 제한
+      onTap: () => _detailCard(context),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // isUse 상태 표시
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: card.isUse ? Colors.green.shade100 : Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(12),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: card.isUse ? Colors.green.shade700 : Colors.grey.shade700,
+                    fontWeight: FontWeight.w500,
                   ),
-                  child: AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: card.isUse ? Colors.green.shade700 : Colors.grey.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    child: Text(card.isUse ? '사용중' : '미사용'),
-                  ),
+                  child: Text(card.isUse ? '사용중' : '미사용'),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          // Category 표시
-          Text(
-            card.category,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
+              ],
             ),
-          ),
-          const SizedBox(height: 4),
-          // Title 표시
-          Expanded(
-            child: Text(
-              card.title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              CustomButton(
-                text: 'Delete',
-                size: ButtonSize.small,
-                style: CustomButtonStyle.danger,
-                onPressed: () => _delete(context, ref),
+            const SizedBox(height: 6),
+            // Category 표시
+            Text(
+              card.category,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(width: 4),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 4),
+            // Title 표시
+            Expanded(
+              child: Text(
+                card.title,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CustomButton(
+                  text: 'Delete',
+                  size: ButtonSize.small,
+                  style: CustomButtonStyle.danger,
+                  onPressed: () => _delete(context, ref),
+                ),
+                const SizedBox(width: 4),
+              ],
+            ),
+          ],
+        ),
       ),
     ),
   );
